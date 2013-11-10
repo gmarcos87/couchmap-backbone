@@ -1,0 +1,34 @@
+{
+  "name": "couchmap-backbone",
+  "version": "0.1.0",
+  "description": "backbonejs models and collections for CouchMap",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/libremap/couchmap-backbone.git"
+  },
+  "keywords": [
+    "backbone",
+    "couchmap",
+    "couchdb",
+    "geocouch"
+  ],
+  "author": "André Gaul <gaul@web-yard.de>",
+  "license": "GPLv3",
+  "bugs": {
+    "url": "https://github.com/libremap/couchmap-backbone/issues"
+  },
+  "dependencies": {
+    "couchmap-common": "libremap/couchmap-common",
+    "underscore": "~1.5.2",
+    "backbone": "~1.1.0"
+  },
+  "devDependencies": {
+    "grunt": "~0.4.1",
+    "grunt-contrib-jshint": "~0.6.4",
+    "grunt-jasmine-node": "~0.1.0"
+  }
+}
