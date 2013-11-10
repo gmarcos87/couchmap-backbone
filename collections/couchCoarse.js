@@ -6,6 +6,7 @@ var CouchCoarseModel = Backbone.Model.extend({
 
 /* CouchCoarseColl
    options:
+    * url: mandatory, URL of the coarse URL
 */
 module.exports = Backbone.Collection.extend({
   initialize: function(models, options) {
@@ -13,7 +14,7 @@ module.exports = Backbone.Collection.extend({
     this.request = undefined;
   },
   update: function(bbox, zoom) {
-    this.cancel();
+    this.abort();
     var tiles = bbox.toTiles(zoom);
     this.request = $.ajax({
       type: 'POST',
@@ -23,15 +24,16 @@ module.exports = Backbone.Collection.extend({
       url: this.url + '?group=true'
     })
     .done(function(data) {
-      this.remove(_.map(tiles, function(k) { return k.toString(); }));
+      var ids = _.map(tiles, function(k) { return k.toString(); });
+      this.remove(ids);
       this.set(_.map(data.rows, function(o) {
         return new CouchCoarseModel(_.extend(o.value, {id: o.key.toString()}));
       }), {remove: false});
-      console.log(this.toJSON());
+      //console.log(_.compact(_.map(ids, function(id) { return this.get(id);}.bind(this))));
     }.bind(this));
     return this.request;
   },
-  cancel: function() {
+  abort: function() {
     if (this.request) {
       this.request.abort();
       this.request = undefined;

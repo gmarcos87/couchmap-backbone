@@ -49,8 +49,10 @@ module.exports = Backbone.Model.extend({
 
     // TODO: cancel requests + stop watch
     this.pending_inc();
+    this.abort();
+    this.coarse_coll.abort();
     // peek into spatial index and check if count is less than threshold
-    $.getJSON(this.fine_url, {bbox: bbox.toString(), count: true})
+    this.request = $.getJSON(this.fine_url, {bbox: bbox.toString(), count: true})
       .done(function(data) {
         this.pending_inc();
         var req;
@@ -65,6 +67,12 @@ module.exports = Backbone.Model.extend({
         console.log('Warning in CouchMap.update(): '+msg);
       })
       .always(this.pending_dec.bind(this));
+  },
+  abort: function() {
+    if (this.request) {
+      this.request.abort();
+      this.request = undefined;
+    }
   }
 
 });
