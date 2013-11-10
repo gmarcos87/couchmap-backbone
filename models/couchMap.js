@@ -59,7 +59,7 @@ module.exports = Backbone.Model.extend({
         if (data.count <= this.threshold) {
           // this.fine_coll.fetch();
         } else {
-          req = this.coarse_coll.update(bbox, zoom);
+          req = this.coarse_coll.fetch(bbox, zoom);
         }
         req.always(this.pending_dec.bind(this));
       }.bind(this))
