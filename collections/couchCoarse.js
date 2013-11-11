@@ -23,16 +23,15 @@ module.exports = Backbone.Collection.extend({
     });
     */
   },
-  fetch: function(bbox, zoom) {
+  fetch: function(bbox, zoom, options) {
     // TODO: remove
     /*
     this.bbox = bbox;
     this.zoom = zoom;
     */
 
-    this.abort();
     var tiles = bbox.toTiles(zoom);
-    this.request = Backbone.Collection.prototype.fetch.call(this, {
+    options = _.extend(options || {}, {
       tiles: tiles,
       remove: false,
       // ajax options
@@ -42,6 +41,9 @@ module.exports = Backbone.Collection.extend({
       data: JSON.stringify({keys: tiles}),
       url: this.url + '?group=true'
     });
+
+    this.abort();
+    this.request = Backbone.Collection.prototype.fetch.call(this, options);
     return this.request;
   },
   abort: function() {
