@@ -18,7 +18,7 @@ var common = require('couchmap-common');
 module.exports = Backbone.Model.extend({
   initialize: function(options) {
     options = options || {};
-    this.threshold = options.threshold || 1;
+    this.threshold = options.threshold || 200;
     this.coarse_url = options.coarse_url;
     this.fine_url = options.fine_url;
     this.bbox = undefined;
@@ -29,9 +29,6 @@ module.exports = Backbone.Model.extend({
     this.set('coarse_coll', new CoarseColl(null, {
       url: options.coarse_url
     }));
-    this.get('coarse_coll').on('add', function(model) {
-      console.log(model.toJSON());
-    });
     // set up fine collection
     var FineColl = options.fineColl ||
                         require('../collections/couchFine');
@@ -40,9 +37,6 @@ module.exports = Backbone.Model.extend({
       changes_url: options.changes_url,
       changes_filter: options.changes_filter
     }));
-    this.get('fine_coll').on('add', function(model) {
-      console.log(model.toJSON());
-    });
   },
   pending_inc: function() {
     this.pending += 1;
@@ -68,15 +62,18 @@ module.exports = Backbone.Model.extend({
     this.abort();
     this.get('coarse_coll').abort();
     // peek into spatial index and check if count is less than threshold
-    console.log(bbox.toGeocouch());
     this.request = $.getJSON(this.fine_url, {bbox: bbox.toGeocouch().toString(), count: true})
       .done(function(data) {
         this.pending_inc();
         var req;
         if (data.count <= this.threshold) {
-          req = this.get('fine_coll').fetch(bbox);
+          req = this.get('fine_coll').fetch(bbox).done(function() {
+            this.trigger('fine');
+          }.bind(this));
         } else {
-          req = this.get('coarse_coll').fetch(bbox, zoom);
+          req = this.get('coarse_coll').fetch(bbox, zoom).done(function() {
+            this.trigger('coarse');
+          }.bind(this));
         }
         req.always(this.pending_dec.bind(this));
       }.bind(this))

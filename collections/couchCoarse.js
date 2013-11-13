@@ -34,6 +34,8 @@ module.exports = Backbone.Collection.extend({
     options = _.extend(options || {}, {
       tiles: tiles,
       remove: false,
+      reset: false,
+      merge: true,
       // ajax options
       type: 'POST',
       dataType: 'json',
@@ -55,9 +57,13 @@ module.exports = Backbone.Collection.extend({
   parse: function(data, options) {
     var req_ids = _.map(options.tiles, function(k) { return k.toString(); });
     var new_ids = _.map(data.rows, function(o) { return o.key.toString(); });
-    this.remove(_.without(req_ids, new_ids));
     return _.map(data.rows, function(o) {
-      return _.extend(o.value, {id: o.key.toString()});
+      return _.extend(o.value, {
+        id: o.key.toString(),
+        zoom: o.key[0],
+        x: o.key[1],
+        y: o.key[2]
+      });
     });
   }
 });

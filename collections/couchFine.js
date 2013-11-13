@@ -2,9 +2,14 @@ var Backbone = require('backbone');
 var _ = require('underscore');
 var $ = require('jquery');
 
+var FineModel = Backbone.Model.extend({
+  idAttribute: '_id'
+});
+
 // fetches models based on bounding boxes and keeps them up-to-date
 // (realized with spatial index via GeoCouch and CouchDB's changes feed)
 module.exports = Backbone.Collection.extend({
+  model: FineModel,
   // initialize respects the following keys in options:
   // * bbox (mandatory): a valid common.bbox (see libremap-common)
   // The following options can also be set by setting them as properties in
