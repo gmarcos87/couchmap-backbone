@@ -41,7 +41,7 @@ module.exports = Backbone.Collection.extend({
       dataType: 'json',
       contentType: 'application/json',
       data: JSON.stringify({keys: tiles}),
-      url: this.url + '?group=true'
+      url: this.url + '?group=true&stale=update_after'
     });
 
     this.abort();
