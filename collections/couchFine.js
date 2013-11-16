@@ -68,6 +68,7 @@ module.exports = Backbone.Collection.extend({
       this.changes_request = $.ajax({
         url: this.changes_url + '?' + $.param({
           filter: this.changes_filter,
+          limit: 100,
           feed: 'longpoll',
           include_docs: 'true',
           since: this.update_seq || 0
@@ -90,7 +91,8 @@ module.exports = Backbone.Collection.extend({
             return row.doc;
           });
           this.set(docs, {remove: false});
-          poll.bind(this)();
+          this.trigger('changes', this, docs);
+          setTimeout(poll.bind(this), 500);
         }.bind(this),
         error: function(jqxhr, msg_status, msg_err) {
           // if not aborted via watch_abort: retry after 10s

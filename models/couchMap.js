@@ -53,6 +53,14 @@ module.exports = Backbone.Model.extend({
     this.set('coarse_coll', new this.CoarseColl(null, this.CoarseCollOptions));
     // set up fine collection
     this.set('fine_coll', new this.FineColl(null, this.FineCollOptions));
+    this.listenTo(this.get('fine_coll'), 'changes', function(collection, docs) {
+      var count = _.size(collection.filter(function (model) {
+        return this.bbox.contains(model.get('lat'), model.get('lon'));
+      }, this));
+      if (count>this.threshold) {
+        this.peek();
+      }
+    });
   },
   pending_inc: function() {
     this.pending += 1;
@@ -68,17 +76,26 @@ module.exports = Backbone.Model.extend({
   },
   update: function(bbox, zoom) {
     if (!bbox) {
-      console.log('Warning in CouchMap.update(): no bbbox given');
+      console.log('Warning in CouchMap.update(): no bbox given');
       return;
     }
     this.bbox = bbox;
+    this.zoom = zoom;
 
-    // TODO: cancel requests + stop watch
+    this.peek();
+  },
+  peek: function() {
+    var bbox = this.bbox;
+    var zoom = this.zoom;
+
     this.pending_inc();
     this.abort();
     this.get('coarse_coll').abort();
     // peek into spatial index and check if count is less than threshold
-    this.request = $.getJSON(this.FineCollOptions.url, {bbox: bbox.toGeocouch().toString(), count: true})
+    this.request = $.getJSON(this.FineCollOptions.url, {
+      bbox: bbox.toGeocouch().toString(),
+      count: true
+    })
       .done(function(data) {
         this.pending_inc();
         var req;
