@@ -15,28 +15,44 @@ var common = require('couchmap-common');
                 representation
     * fine_url: mandatory, the URL for fine (spatial) requests.
 */
+var db_url = 'http://couchmap.d00d3.net/db/';
+var ddoc_url = 'http://couchmap.d00d3.net/';
+var defaults = {
+  coarse_url: ddoc_url + '/../_view/coarse',
+  fine_url: ddoc_url + '/../_spatial/by_location',
+  changes_url: db_url + '/_changes',
+  changes_filter: 'couchmap-api/by_id_or_bbox'
+};
+
 module.exports = Backbone.Model.extend({
-  initialize: function(options) {
-    options = options || {};
-    this.threshold = options.threshold || 200;
-    this.coarse_url = options.coarse_url;
-    this.fine_url = options.fine_url;
+  initialize: function(attributes, options) {
+    this.options = options || {};
+    _.extend(this, {
+        CoarseColl: require('../collections/couchCoarse'),
+        CoarseCollOptions: {
+          url: defaults.coarse_url,
+          changes_url: defaults.changes_url,
+          changes_filter: defaults.changes_filter
+        },
+        FineColl: require('../collections/couchFine'),
+        FineCollOptions: {
+          url: defaults.fine_url,
+          changes_url: defaults.changes_url,
+          changes_filter: defaults.changes_filter
+        },
+        threshold: 200,
+      },
+      _.pick(this.options,
+        'CoarseColl', 'CoarseCollOptions',
+        'FineColl', 'FineCollOptions',
+        'threshold'
+        ));
     this.bbox = undefined;
     this.pending = 0;
     // set up coarse collection
-    var CoarseColl = options.coarseColl ||
-                        require('../collections/couchCoarse');
-    this.set('coarse_coll', new CoarseColl(null, {
-      url: options.coarse_url
-    }));
+    this.set('coarse_coll', new this.CoarseColl(null, this.CoarseCollOptions));
     // set up fine collection
-    var FineColl = options.fineColl ||
-                        require('../collections/couchFine');
-    this.set('fine_coll', new FineColl(null, {
-      url: options.fine_url,
-      changes_url: options.changes_url,
-      changes_filter: options.changes_filter
-    }));
+    this.set('fine_coll', new this.FineColl(null, this.FineCollOptions));
   },
   pending_inc: function() {
     this.pending += 1;
@@ -62,7 +78,7 @@ module.exports = Backbone.Model.extend({
     this.abort();
     this.get('coarse_coll').abort();
     // peek into spatial index and check if count is less than threshold
-    this.request = $.getJSON(this.fine_url, {bbox: bbox.toGeocouch().toString(), count: true})
+    this.request = $.getJSON(this.FineCollOptions.url, {bbox: bbox.toGeocouch().toString(), count: true})
       .done(function(data) {
         this.pending_inc();
         var req;
