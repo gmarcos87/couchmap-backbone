@@ -13,15 +13,6 @@ module.exports = Backbone.Collection.extend({
   initialize: function(models, options) {
     this.url = options.url;
     this.request = undefined;
-
-    // TODO: remove
-    /*
-    this.on('sync', function() {
-      var tiles = this.bbox.toTiles(this.zoom);
-      var ids = _.map(tiles, function(k) { return k.toString(); });
-      console.log(_.compact(_.map(ids, function(id) { return this.get(id);}.bind(this))));
-    });
-    */
   },
   fetch: function(bbox, zoom, options) {
     // TODO: remove
