@@ -2,13 +2,13 @@ var Backbone = require('backbone');
 var _ = require('underscore');
 var common = require('couchmap-common');
 
-/* CouchMapModel
+/* ProxyModel
 
    options:
     * threshold: optional (500), if less than this number of nodes are
                  in the given bounding box, then the fine model is used,
                  otherwise the coarse.
-    * coarseColl: optional (CouchCoarseColl), the collection used for the
+    * coarseColl: optional (CoarseColl), the collection used for the
                   coarse representation.
     * coarse_url: mandatory, the URL for coarse requests.
     * fineColl: optional (FineColl), the collection used for the fine
@@ -28,13 +28,13 @@ module.exports = Backbone.Model.extend({
   initialize: function(attributes, options) {
     this.options = options || {};
     _.extend(this, {
-        CoarseColl: require('../collections/couchCoarse'),
+        CoarseColl: require('../collections/coarse'),
         CoarseCollOptions: {
           url: defaults.coarse_url,
           changes_url: defaults.changes_url,
           changes_filter: defaults.changes_filter
         },
-        FineColl: require('../collections/couchFine'),
+        FineColl: require('../collections/fine'),
         FineCollOptions: {
           url: defaults.fine_url,
           changes_url: defaults.changes_url,
