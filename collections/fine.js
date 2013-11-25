@@ -114,5 +114,8 @@ module.exports = Backbone.Collection.extend({
       this.changes_request = null;
       request.abort();
     }
+  },
+  abort: function() {
+    this.watch_abort();
   }
 });

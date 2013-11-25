@@ -120,6 +120,8 @@ module.exports = Backbone.Model.extend({
       this.request.abort();
       this.request = undefined;
     }
+    this.get('coarse_coll').abort();
+    this.get('fine_coll').abort();
   }
 
 });
