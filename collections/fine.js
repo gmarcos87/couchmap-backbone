@@ -53,6 +53,7 @@ module.exports = Backbone.Collection.extend({
   // bounding box to the filter function
   watch: function () {
     (function poll() {
+      this.watch_abort();
       // gather all ids of documents that are inside the collection but outside
       // the current bounding box
       var ids_outside = _.map(
@@ -83,7 +84,8 @@ module.exports = Backbone.Collection.extend({
         dataType: "json",
         contentType: "application/json",
         timeout: 65000,
-        success: function(data) {
+      })
+        .done(function(data) {
           // update update_seq, merge the changes and set up a new changes
           // request
           this.update_seq = data.last_seq;
@@ -93,26 +95,27 @@ module.exports = Backbone.Collection.extend({
           this.set(docs, {remove: false});
           this.trigger('changes', this, docs);
           setTimeout(poll.bind(this), 500);
-        }.bind(this),
-        error: function(jqxhr, msg_status, msg_err) {
+        }.bind(this))
+        .fail(function(jqxhr, msg_status, msg_err) {
+          this.changes_request = null;
           // if not aborted via watch_abort: retry after 10s
           // otherwise: do nothing :)
-          if (this.changes_request) {
-            this.changes_request = null;
-            console.log('changes feed: failed ('+msg_status+'): '+msg_err);
-            console.log('changes feed: retrying in 10s...');
+          if (msg_status=='abort') {
+            console.log('Info (watch): aborted.');
+          } else if (msg_status=='timeout') {
+            setTimeout(poll.bind(this), 500);
+          } else {
+            console.log('Warning (watch): failed ('+msg_status+')');
+            console.log('Warning (watch): retrying in 10s...');
             setTimeout(poll.bind(this), 10000);
           }
-        }.bind(this)
-      });
+        }.bind(this));
     }).bind(this)();
   },
   // abort watch
   watch_abort: function() {
     if (this.changes_request) {
-      var request = this.changes_request;
-      this.changes_request = null;
-      request.abort();
+      this.changes_request.abort();
     }
   },
   abort: function() {

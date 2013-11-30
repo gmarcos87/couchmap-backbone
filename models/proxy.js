@@ -110,8 +110,12 @@ module.exports = Backbone.Model.extend({
         }
         req.always(this.pending_dec.bind(this));
       }.bind(this))
-      .fail(function(jqxhr, msg) {
-        console.log('Warning in CouchMap.update(): '+msg);
+      .fail(function(jqxhr, msg_status) {
+        if (msg_status=='abort') {
+          console.log('Info (peek): aborted.');
+        } else {
+          console.log('Warning (peek): failed ('+msg_status+')');
+        }
       })
       .always(this.pending_dec.bind(this));
   },
