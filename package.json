@@ -22,13 +22,14 @@
     "url": "https://github.com/libremap/couchmap-backbone/issues"
   },
   "dependencies": {
-    "couchmap-common": "libremap/couchmap-common",
-    "underscore": "~1.5.2",
-    "backbone": "~1.1.0"
+    "backbone": "^1.1.2",
+    "couchmap-common": "git://github.com/gmarcos87/couchmap-common#master",
+    "jquery": "^3.1.1",
+    "underscore": "^1.8.3"
   },
   "devDependencies": {
-    "grunt": "~0.4.1",
-    "grunt-contrib-jshint": "~0.6.4",
-    "grunt-jasmine-node": "~0.1.0"
+    "grunt": "^1.0.1",
+    "grunt-contrib-jshint": "^1.1.0",
+    "grunt-jasmine-node": "^0.3.1"
   }
 }
