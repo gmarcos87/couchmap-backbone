@@ -5,11 +5,16 @@ module.exports = function(grunt) {
     jshint: {
       files: ['**/*.js', '!node_modules/**/*.js']
     },
-    // jasmine unit tests
     jasmine_node: {
-      specNameMatcher: 'Spec',
-      forceExit: true
-    }
+     options: {
+       forceExit: true,
+       match: '.',
+       matchall: false,
+       extensions: 'js',
+       specNameMatcher: 'spec'
+     },
+     all: ['spec/']
+   }
   });
   grunt.loadNpmTasks('grunt-contrib-jshint');
   grunt.loadNpmTasks('grunt-jasmine-node');
